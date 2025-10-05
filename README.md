@@ -58,3 +58,36 @@ A comprehensive web application for tracking satellites, predicting collisions w
 ### 1. Clone or Navigate to Project Directory
 ```bash
 cd c:\Users\farhan\Projects\websitespaceapps\appss
+```
+
+2. Create a Virtual Environment (Recommended)
+```   
+python -m venv venv
+venv\Scripts\activate
+```
+3. Install Dependencies
+```
+pip install -r requirements.txt
+
+pip install --upgrade pip
+pip install cartopy --no-binary cartopy
+```
+
+▶️ Running the Application
+
+1. Start the Flask Server
+```
+python app.py
+```
+
+Expected output:
+```
+ * Running on http://0.0.0.0:5000
+ * Debug mode: on
+```
+2. Access the Web Interface
+Open your browser and go to:
+```
+http://localhost:5000
+```
+
