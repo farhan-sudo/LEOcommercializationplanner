@@ -1,0 +1,84 @@
+<svg width="800" height="500" viewBox="0 0 800 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Dark background -->
+  <rect width="800" height="500" fill="#001a1d"/>
+  
+  <!-- World map simplified (continents) -->
+  <g opacity="0.4">
+    <!-- North America -->
+    <path d="M 100 100 Q 150 80 200 100 L 250 150 L 200 200 L 150 180 L 100 150 Z" fill="#2a4a4d" stroke="#03BFB5" stroke-width="0.5"/>
+    
+    <!-- South America -->
+    <path d="M 180 250 L 220 280 L 200 350 L 160 340 L 150 300 Z" fill="#2a4a4d" stroke="#03BFB5" stroke-width="0.5"/>
+    
+    <!-- Europe -->
+    <path d="M 380 120 L 420 110 L 450 140 L 430 170 L 390 160 Z" fill="#2a4a4d" stroke="#03BFB5" stroke-width="0.5"/>
+    
+    <!-- Africa -->
+    <path d="M 380 200 L 420 190 L 450 250 L 430 320 L 390 310 L 370 260 Z" fill="#2a4a4d" stroke="#03BFB5" stroke-width="0.5"/>
+    
+    <!-- Asia -->
+    <path d="M 480 100 L 580 90 L 620 130 L 600 180 L 520 200 L 480 160 Z" fill="#2a4a4d" stroke="#03BFB5" stroke-width="0.5"/>
+    
+    <!-- Australia -->
+    <path d="M 600 280 L 650 270 L 660 310 L 630 330 L 590 320 Z" fill="#2a4a4d" stroke="#03BFB5" stroke-width="0.5"/>
+  </g>
+  
+  <!-- Grid lines (latitude/longitude) -->
+  <g opacity="0.2" stroke="#03BFB5" stroke-width="0.5">
+    <!-- Horizontal lines -->
+    <line x1="0" y1="100" x2="800" y2="100"/>
+    <line x1="0" y1="200" x2="800" y2="200"/>
+    <line x1="0" y1="300" x2="800" y2="300"/>
+    <line x1="0" y1="400" x2="800" y2="400"/>
+    
+    <!-- Vertical lines -->
+    <line x1="100" y1="0" x2="100" y2="500"/>
+    <line x1="200" y1="0" x2="200" y2="500"/>
+    <line x1="300" y1="0" x2="300" y2="500"/>
+    <line x1="400" y1="0" x2="400" y2="500"/>
+    <line x1="500" y1="0" x2="500" y2="500"/>
+    <line x1="600" y1="0" x2="600" y2="500"/>
+    <line x1="700" y1="0" x2="700" y2="500"/>
+  </g>
+  
+  <!-- Satellite orbit path -->
+  <path d="M 150 400 Q 300 200 450 300 Q 600 400 700 250" stroke="#03BFB5" stroke-width="2" fill="none" opacity="0.6" stroke-dasharray="10,5"/>
+  
+  <!-- Satellite icon -->
+  <g transform="translate(250, 320)">
+    <circle cx="0" cy="0" r="8" fill="#03BFB5"/>
+    <rect x="-15" y="-2" width="12" height="4" fill="#03BFB5" opacity="0.8"/>
+    <rect x="3" y="-2" width="12" height="4" fill="#03BFB5" opacity="0.8"/>
+    <text x="15" y="25" font-family="Arial, sans-serif" font-size="14" fill="#03BFB5" font-weight="bold">satellite1</text>
+  </g>
+  
+  <!-- Coverage circles -->
+  <circle cx="250" cy="320" r="100" fill="none" stroke="#03BFB5" stroke-width="1" opacity="0.3" stroke-dasharray="5,5"/>
+  <circle cx="250" cy="320" r="150" fill="none" stroke="#03BFB5" stroke-width="1" opacity="0.2" stroke-dasharray="5,5"/>
+  
+  <!-- Distance markers at bottom -->
+  <g opacity="0.5" fill="#03BFB5">
+    <text x="50" y="480" font-size="12">-120°</text>
+    <text x="200" y="480" font-size="12">-60°</text>
+    <text x="380" y="480" font-size="12">0°</text>
+    <text x="550" y="480" font-size="12">60°</text>
+    <text x="700" y="480" font-size="12">120°</text>
+  </g>
+  
+  <!-- Side scale -->
+  <g opacity="0.5" fill="#03BFB5">
+    <text x="10" y="50" font-size="12">60°</text>
+    <text x="10" y="150" font-size="12">30°</text>
+    <text x="10" y="250" font-size="12">0°</text>
+    <text x="10" y="350" font-size="12">-30°</text>
+    <text x="10" y="450" font-size="12">-60°</text>
+  </g>
+  
+  <!-- Data points -->
+  <g>
+    <circle cx="300" cy="150" r="3" fill="#03BFB5" opacity="0.6"/>
+    <circle cx="450" cy="200" r="3" fill="#03BFB5" opacity="0.6"/>
+    <circle cx="550" cy="280" r="3" fill="#03BFB5" opacity="0.6"/>
+    <circle cx="200" cy="280" r="3" fill="#03BFB5" opacity="0.6"/>
+  </g>
+</svg>

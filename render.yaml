@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: leo-planner
+    runtime: python
+    buildCommand: |
+      apt-get update
+      apt-get install -y libgeos-dev libproj-dev proj-data proj-bin
+      pip install --upgrade pip setuptools wheel
+      pip install -r requirements.txt
+    startCommand: gunicorn appss.app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0

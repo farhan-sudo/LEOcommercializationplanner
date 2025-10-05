@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}Debris Visualization - Satellite Tracking System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="mb-0">Space Debris Visualization</h2>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">
+                    Visualize space debris distribution in Low Earth Orbit (LEO) categorized by altitude ranges.
+                </p>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label"><strong>Select Altitude Category</strong></label>
+                        <select class="form-select" id="categorySelect">
+                            <option value="">All Categories</option>
+                            <option value="0">160-528 km (Very Low LEO)</option>
+                            <option value="1">528-896 km (Low LEO)</option>
+                            <option value="2">896-1264 km (Mid LEO)</option>
+                            <option value="3">1264-1632 km (High LEO)</option>
+                            <option value="4">1632-2000 km (Very High LEO)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 d-flex align-items-end">
+                        <button class="btn btn-primary w-100" onclick="loadDebrisMap()">
+                            Generate Map
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Statistics -->
+                <div class="row mb-4" id="debrisStats" style="display: none;">
+                    <div class="col-md-4">
+                        <div class="stat-card">
+                            <div class="stat-number" id="debrisCount">0</div>
+                            <div class="text-muted">Total Debris Objects</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stat-card">
+                            <div class="stat-number" id="categoryName">---</div>
+                            <div class="text-muted">Altitude Range</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stat-card">
+                            <div class="stat-number" id="coveragePercent">---</div>
+                            <div class="text-muted">Density</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Map Container -->
+                <div id="mapContainer" style="display: none;">
+                    <h5 class="mb-3">Debris Distribution Map</h5>
+                    <div class="text-center">
+                        <img id="debrisMapImage" src="" alt="Debris Map" class="img-fluid rounded shadow" style="max-width: 100%;">
+                    </div>
+                </div>
+                
+                <!-- Interactive Map -->
+                <div id="interactiveMap" style="display: none;">
+                    <h5 class="mb-3 mt-4">Interactive Map</h5>
+                    <div id="leafletMap" style="height: 500px; border-radius: 10px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Debris Information -->
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">LEO Altitude Categories</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><span class="badge bg-danger">Cat 0</span> Very Low LEO</span>
+                        <strong>160-528 km</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><span class="badge bg-warning">Cat 1</span> Low LEO</span>
+                        <strong>528-896 km</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><span class="badge bg-info">Cat 2</span> Mid LEO</span>
+                        <strong>896-1264 km</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><span class="badge bg-primary">Cat 3</span> High LEO</span>
+                        <strong>1264-1632 km</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><span class="badge bg-success">Cat 4</span> Very High LEO</span>
+                        <strong>1632-2000 km</strong>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">About Space Debris</h5>
+            </div>
+            <div class="card-body">
+                <p>
+                    <strong>Space debris</strong> consists of non-functional spacecraft, abandoned launch vehicle stages, 
+                    mission-related debris, and fragmentation debris.
+                </p>
+                <p>
+                    The FENGYUN-1C satellite was destroyed in an anti-satellite test in 2007, 
+                    creating over 3,500 pieces of trackable debris.
+                </p>
+                <p class="mb-0">
+                    <strong>Key Facts:</strong>
+                </p>
+                <ul>
+                    <li>Debris travels at ~7-8 km/s in LEO</li>
+                    <li>Can cause catastrophic damage to spacecraft</li>
+                    <li>Kessler Syndrome: cascading collision risk</li>
+                    <li>Tracking essential for space safety</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/debris-visualization.js') }}"></script>
+{% endblock %}

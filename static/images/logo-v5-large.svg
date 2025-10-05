@@ -1,0 +1,57 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Main Circle Background -->
+  <circle cx="100" cy="100" r="95" fill="url(#mainGradient)" filter="url(#shadow)"/>
+  
+  <!-- Gradients -->
+  <defs>
+    <linearGradient id="mainGradient" x1="0" y1="0" x2="200" y2="200" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#03BFB5"/>
+      <stop offset="50%" stop-color="#018076"/>
+      <stop offset="100%" stop-color="#004146"/>
+    </linearGradient>
+    
+    <!-- Shadow Effect -->
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="5"/>
+      <feOffset dx="0" dy="5" result="offsetblur"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.3"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Orbital Rings -->
+  <circle cx="100" cy="100" r="85" stroke="rgba(255,255,255,0.2)" stroke-width="2" fill="none" stroke-dasharray="5,5"/>
+  <circle cx="100" cy="100" r="75" stroke="rgba(255,255,255,0.15)" stroke-width="1.5" fill="none" stroke-dasharray="3,3"/>
+  <circle cx="100" cy="100" r="65" stroke="rgba(255,255,255,0.1)" stroke-width="1" fill="none" stroke-dasharray="2,2"/>
+  
+  <!-- V Shape (Stylized) -->
+  <g transform="translate(100, 100)">
+    <!-- Left part of V -->
+    <path d="M -35 -30 L -10 30 L -5 30 L -30 -30 Z" fill="white" opacity="0.95"/>
+    <!-- Right part of V -->
+    <path d="M 5 30 L 10 30 L -15 -30 L -10 -30 Z" fill="white" opacity="0.95"/>
+  </g>
+  
+  <!-- Number 5 -->
+  <text x="125" y="115" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="70" font-weight="800" fill="white" opacity="0.95">5</text>
+  
+  <!-- Small Satellite Icons -->
+  <g opacity="0.4">
+    <!-- Top satellite -->
+    <circle cx="100" cy="20" r="3" fill="white"/>
+    <rect x="98" y="15" width="4" height="2" fill="white"/>
+    
+    <!-- Bottom right satellite -->
+    <circle cx="165" cy="135" r="3" fill="white"/>
+    <rect x="163" y="130" width="4" height="2" fill="white"/>
+    
+    <!-- Left satellite -->
+    <circle cx="30" cy="100" r="3" fill="white"/>
+    <rect x="28" y="95" width="4" height="2" fill="white"/>
+  </g>
+</svg>

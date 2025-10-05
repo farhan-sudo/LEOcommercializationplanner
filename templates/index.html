@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Satellite Tracking System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="mb-0">Welcome to Satellite & Debris Tracking System</h2>
+            </div>
+            <div class="card-body">
+                <p class="lead">
+                    A comprehensive system for tracking satellites, predicting collisions with space debris, 
+                    and visualizing orbital data in real-time.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <!-- Feature Cards -->
+    <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <div class="feature-icon">
+                    </div>
+                <h4>Collision Prediction</h4>
+                <p class="text-muted">
+                    Predict potential collisions between satellites and space debris using advanced orbital mechanics.
+                </p>
+                <a href="/collision-prediction" class="btn btn-primary mt-3">
+                    Start Prediction
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <div class="feature-icon">
+                    </div>
+                <h4>Debris Visualization</h4>
+                <p class="text-muted">
+                    Visualize space debris distribution across different altitude ranges in Low Earth Orbit.
+                </p>
+                <a href="/debris-visualization" class="btn btn-primary mt-3">
+                    View Map
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <div class="feature-icon">
+                    </div>
+                <h4>Satellite Tracking</h4>
+                <p class="text-muted">
+                    Track satellite positions in real-time and visualize their trajectories across the globe.
+                </p>
+                <a href="/satellite-tracking" class="btn btn-primary mt-3">
+                    Track Now
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <div class="feature-icon">
+                    </div>
+                <h4>Passing Time</h4>
+                <p class="text-muted">
+                    Calculate when satellites will pass over specific locations on Earth.
+                </p>
+                <a href="/passing-time" class="btn btn-primary mt-3">
+                    Calculate
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Section -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">System Statistics</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalSatellites">---</div>
+                            <div class="text-muted">Total Satellites</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalDebris">---</div>
+                            <div class="text-muted">Debris Objects</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stat-card">
+                            <div class="stat-number" id="safePredictions">---</div>
+                            <div class="text-muted">Safe Predictions</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stat-card">
+                            <div class="stat-number" id="collisionAlerts">---</div>
+                            <div class="text-muted">Collision Alerts</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Info -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">About the System</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Technologies Used</h5>
+                        <ul>
+                            <li><strong>Flask:</strong> Python web framework for backend</li>
+                            <li><strong>SGP4:</strong> Satellite orbit propagation</li>
+                            <li><strong>Skyfield:</strong> Astronomy and satellite tracking</li>
+                            <li><strong>Cartopy:</strong> Geospatial data visualization</li>
+                            <li><strong>Bootstrap 5:</strong> Modern responsive UI</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Data Sources</h5>
+                        <ul>
+                            <li><strong>TLE Data:</strong> Two-Line Element sets for orbital parameters</li>
+                            <li><strong>FENGYUN Debris:</strong> Space debris catalog</li>
+                            <li><strong>WGS84:</strong> World Geodetic System coordinates</li>
+                            <li><strong>Real-time Propagation:</strong> Current satellite positions</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

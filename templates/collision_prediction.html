@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}Collision Prediction - Satellite Tracking System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="mb-0">Satellite Collision Prediction</h2>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">
+                    Enter satellite TLE (Two-Line Element) data to predict potential collisions with space debris.
+                </p>
+                
+                <form id="collisionForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label"><strong>TLE Line 1</strong></label>
+                                <input type="text" class="form-control font-monospace" id="tleLine1" 
+                                       placeholder="1 25544U 98067A   ..." required>
+                                <small class="form-text text-muted">First line of TLE data (starts with '1')</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label"><strong>TLE Line 2</strong></label>
+                                <input type="text" class="form-control font-monospace" id="tleLine2" 
+                                       placeholder="2 25544  51.6328 ..." required>
+                                <small class="form-text text-muted">Second line of TLE data (starts with '2')</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label"><strong>Number of Orbital Periods</strong></label>
+                                <input type="number" class="form-control" id="numPeriods" value="5" min="1" max="10">
+                                <small class="form-text text-muted">How many orbits to predict (1-10)</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label"><strong>Time Step (minutes)</strong></label>
+                                <input type="number" class="form-control" id="timeStep" value="1" min="1" max="10">
+                                <small class="form-text text-muted">Sampling interval (1-10 min)</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label"><strong>Collision Threshold (km)</strong></label>
+                                <input type="number" class="form-control" id="threshold" value="5.0" step="0.1" min="0.1">
+                                <small class="form-text text-muted">Minimum safe distance</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <button type="button" class="btn btn-secondary" onclick="loadExampleTLE()">
+                            Load Example (ISS)
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            Predict Collision
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Results Section -->
+<div class="row mt-4" id="resultsSection" style="display: none;">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Prediction Results</h4>
+            </div>
+            <div class="card-body">
+                <!-- Status Alert -->
+                <div id="statusAlert"></div>
+                
+                <!-- Statistics -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-number text-info" id="statMinDistance">---</div>
+                            <div class="text-muted">Min Distance (km)</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-number text-warning" id="statCollisionCount">---</div>
+                            <div class="text-muted">Collision Points</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-number text-success" id="statSafetyMargin">---</div>
+                            <div class="text-muted">Safety Margin (km)</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-number text-primary" id="statStatus">---</div>
+                            <div class="text-muted">Status</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Details -->
+                <div id="detailsContainer"></div>
+                
+                <!-- Collision Points Table -->
+                <div id="collisionPointsContainer" style="display: none;">
+                    <h5 class="mt-4">Collision Points Details</h5>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Time (UTC)</th>
+                                    <th>Distance (km)</th>
+                                    <th>Latitude</th>
+                                    <th>Longitude</th>
+                                    <th>Altitude (km)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="collisionPointsTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/collision-prediction.js') }}"></script>
+{% endblock %}

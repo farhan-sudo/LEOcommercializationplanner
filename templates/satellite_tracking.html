@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}Satellite Tracking - Satellite Tracking System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="mb-0">Real-Time Satellite Tracking</h2>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">
+                    Track satellite position in real-time using TLE data.
+                </p>
+                
+                <form id="trackingForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label"><strong>TLE Line 1</strong></label>
+                                <input type="text" class="form-control font-monospace" id="tleLine1" 
+                                       placeholder="1 25544U 98067A   ..." required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label"><strong>TLE Line 2</strong></label>
+                                <input type="text" class="form-control font-monospace" id="tleLine2" 
+                                       placeholder="2 25544  51.6328 ..." required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <button type="button" class="btn btn-secondary" onclick="loadExampleTLE()">
+                            Load Example (ISS)
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            Track Satellite
+                        </button>
+                        <button type="button" class="btn btn-success" id="autoUpdateBtn" onclick="toggleAutoUpdate()" disabled>
+                            Auto Update: OFF
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Position Information -->
+<div class="row mt-4" id="positionSection" style="display: none;">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Satellite Position</h4>
+            </div>
+            <div class="card-body">
+                <div id="trackingMap" style="height: 500px; border-radius: 10px;"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Current Data</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong>Time (UTC):</strong>
+                    <div class="text-primary" id="currentTime">---</div>
+                </div>
+                
+                <div class="mb-3">
+                    <strong>Latitude:</strong>
+                    <div class="text-primary" id="currentLat">---</div>
+                </div>
+                
+                <div class="mb-3">
+                    <strong>Longitude:</strong>
+                    <div class="text-primary" id="currentLon">---</div>
+                </div>
+                
+                <div class="mb-3">
+                    <strong>Altitude:</strong>
+                    <div class="text-primary" id="currentAlt">---</div>
+                </div>
+                
+                <div class="mb-3">
+                    <strong>Orbital Period:</strong>
+                    <div class="text-primary" id="orbitalPeriod">---</div>
+                </div>
+                
+                <hr>
+                
+                <div class="mb-3">
+                    <strong>ECI Position (km):</strong>
+                    <div class="small">
+                        <div>X: <span id="posX">---</span></div>
+                        <div>Y: <span id="posY">---</span></div>
+                        <div>Z: <span id="posZ">---</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="mb-0">Update Status</h5>
+            </div>
+            <div class="card-body">
+                <div id="updateStatus" class="text-muted">
+                    No updates yet
+                </div>
+                <div class="mt-2">
+                    <small>Last Update: <span id="lastUpdate">---</span></small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/satellite-tracking.js') }}"></script>
+
+<style>
+    .satellite-marker {
+        text-align: center;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.2); }
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,580 @@
+{% extends "base.html" %}
+
+{% block title %}Satellite Passing Time - Satellite Tracking System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="mb-0">Satellite Passing Time Calculator</h2>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">
+                    Calculate when a satellite will pass over a specific location on Earth.
+                </p>
+                
+                <form id="passingTimeForm">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label"><strong>Satellite Name</strong></label>
+                                <input type="text" class="form-control" id="satName" 
+                                       placeholder="e.g., ISS (ZARYA)" value="ISS (ZARYA)">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label"><strong>TLE Line 1</strong></label>
+                                <input type="text" class="form-control font-monospace small" id="tleLine1" 
+                                       placeholder="1 25544U 98067A   ..." required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label"><strong>TLE Line 2</strong></label>
+                                <input type="text" class="form-control font-monospace small" id="tleLine2" 
+                                       placeholder="2 25544  51.6328 ..." required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label class="form-label"><strong>Latitude (°)</strong></label>
+                                <input type="number" class="form-control" id="latitude" 
+                                       step="0.000001" placeholder="e.g., -6.200000" value="-6.200000" required>
+                                <small class="text-muted">-90 to 90</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label class="form-label"><strong>Longitude (°)</strong></label>
+                                <input type="number" class="form-control" id="longitude" 
+                                       step="0.000001" placeholder="e.g., 106.816666" value="106.816666" required>
+                                <small class="text-muted">-180 to 180</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label class="form-label"><strong>Elevation (m)</strong></label>
+                                <input type="number" class="form-control" id="elevation" 
+                                       placeholder="e.g., 5" value="5" required>
+                                <small class="text-muted">Meters above sea level</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label class="form-label"><strong>Min Elevation (°)</strong></label>
+                                <input type="number" class="form-control" id="minElevation" 
+                                       value="10" min="0" max="90" required>
+                                <small class="text-muted">Minimum angle above horizon</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-light border">
+                        <h6 class="mb-2">Search Time Window</h6>
+                        <p class="mb-0 text-muted small">
+                            Specify when to start searching for satellite passes and how long to search. 
+                            All times are in <strong>UTC timezone</strong>. Use "Current Time" button for now.
+                        </p>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label"><strong>Start Date</strong></label>
+                                <input type="date" class="form-control" id="startDate" required>
+                                <small class="text-muted">Date to start searching for passes</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label"><strong>Start Time (UTC)</strong></label>
+                                <input type="time" class="form-control" id="startTime" required>
+                                <small class="text-muted">Time in UTC timezone</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label"><strong>Search Duration</strong></label>
+                                <select class="form-select" id="searchDuration">
+                                    <option value="6">6 hours</option>
+                                    <option value="12">12 hours</option>
+                                    <option value="24" selected>24 hours (1 day)</option>
+                                    <option value="48">48 hours (2 days)</option>
+                                    <option value="72">72 hours (3 days)</option>
+                                    <option value="168">168 hours (7 days)</option>
+                                </select>
+                                <small class="text-muted">How far ahead to search</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <button type="button" class="btn btn-secondary" onclick="loadExampleData()">
+                            Load Example (ISS over Jakarta)
+                        </button>
+                        <button type="button" class="btn btn-info" onclick="setCurrentTime()">
+                            Use Current Time
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            Calculate Passes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Results Section -->
+<div class="row mt-4" id="resultsSection" style="display: none;">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">Upcoming Passes (Next 24 Hours)</h4>
+                <button class="btn btn-sm btn-outline-light" onclick="exportPassData()" id="exportBtn" style="display:none;">
+                    Export Data
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info mb-4">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>Location:</strong> <span id="displayLocation">---</span><br>
+                            <strong>Min Elevation:</strong> <span id="displayMinElev">10</span>°
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Search Period:</strong><br>
+                            <span id="displaySearchPeriod">---</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="passesContainer"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Location Info -->
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Popular Locations</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    <button class="list-group-item list-group-item-action" onclick="setLocation(-6.200000, 106.816666, 5, 'Jakarta')">
+                        <strong>Jakarta, Indonesia</strong><br>
+                        <small>Lat: -6.20°, Lon: 106.82°</small>
+                    </button>
+                    <button class="list-group-item list-group-item-action" onclick="setLocation(40.7128, -74.0060, 10, 'New York')">
+                        <strong>New York, USA</strong><br>
+                        <small>Lat: 40.71°, Lon: -74.01°</small>
+                    </button>
+                    <button class="list-group-item list-group-item-action" onclick="setLocation(51.5074, -0.1278, 11, 'London')">
+                        <strong>London, UK</strong><br>
+                        <small>Lat: 51.51°, Lon: -0.13°</small>
+                    </button>
+                    <button class="list-group-item list-group-item-action" onclick="setLocation(35.6762, 139.6503, 40, 'Tokyo')">
+                        <strong>Tokyo, Japan</strong><br>
+                        <small>Lat: 35.68°, Lon: 139.65°</small>
+                    </button>
+                    <button class="list-group-item list-group-item-action" onclick="setLocation(-33.8688, 151.2093, 58, 'Sydney')">
+                        <strong>Sydney, Australia</strong><br>
+                        <small>Lat: -33.87°, Lon: 151.21°</small>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Understanding the Results</h5>
+            </div>
+            <div class="card-body">
+                <h6 class="mb-3">Key Terms Explained</h6>
+                <dl class="mb-3">
+                    <dt>AOS (Acquisition of Signal)</dt>
+                    <dd>The exact time when the satellite rises above your specified minimum elevation angle and becomes visible from your location. This is when you should start looking for the satellite.</dd>
+                    
+                    <dt>Maximum Elevation</dt>
+                    <dd>The highest point in the sky the satellite reaches during the pass, measured in degrees from the horizon (0°) to directly overhead (90°). This is the best time to observe or communicate with the satellite.</dd>
+                    
+                    <dt>LOS (Loss of Signal)</dt>
+                    <dd>The exact time when the satellite drops below your minimum elevation angle and disappears from view. The satellite is no longer visible after this time.</dd>
+                    
+                    <dt>Azimuth</dt>
+                    <dd>The compass direction where the satellite will be at maximum elevation:
+                        <ul class="mt-1 mb-0">
+                            <li>0° = North</li>
+                            <li>90° = East</li>
+                            <li>180° = South</li>
+                            <li>270° = West</li>
+                        </ul>
+                    </dd>
+                    
+                    <dt>Duration</dt>
+                    <dd>Total time (in minutes) the satellite is visible above your minimum elevation angle, from AOS to LOS.</dd>
+                </dl>
+                
+                <div class="alert alert-info mb-2">
+                    <small>
+                        <strong>Pass Quality Guide:</strong><br>
+                        • <strong>60°+ elevation:</strong> Excellent - Directly overhead<br>
+                        • <strong>45-60°:</strong> Very Good - High in the sky<br>
+                        • <strong>30-45°:</strong> Good - Moderate altitude<br>
+                        • <strong>20-30°:</strong> Fair - Lower altitude<br>
+                        • <strong>&lt;20°:</strong> Low - Near horizon
+                    </small>
+                </div>
+                
+                <div class="alert alert-warning mb-0">
+                    <small>
+                        <strong>Observation Tips:</strong><br>
+                        1. Set up your equipment 5-10 minutes before AOS<br>
+                        2. Look in the azimuth direction at the AOS time<br>
+                        3. Track the satellite to maximum elevation<br>
+                        4. Higher elevation = better signal and visibility
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/passing-time.js') }}"></script>
+{% endblock %}
+                    tle_line2: tleLine2,
+                    latitude: latitude,
+                    longitude: longitude,
+                    elevation: elevation,
+                    min_elevation: minElevation,
+                    start_date: startDate,
+                    start_time: startTime,
+                    search_duration: searchDuration
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                displayPasses(data.passes, minElevation, latitude, longitude);
+            } else {
+                showAlert('Error: ' + data.error, 'danger');
+            }
+        } catch (error) {
+            showAlert('Error: ' + error.message, 'danger');
+
+        document.getElementById('resultsSection').style.display = 'block';
+        document.getElementById('displayMinElev').textContent = minElev;
+        document.getElementById('displayLocation').textContent = `${lat.toFixed(4)}°, ${lon.toFixed(4)}°`;
+        
+        // Display search period
+        const startDate = document.getElementById('startDate').value;
+        const startTime = document.getElementById('startTime').value;
+        const duration = document.getElementById('searchDuration').value;
+        const startDateTime = new Date(`${startDate}T${startTime}:00Z`);
+        const endDateTime = new Date(startDateTime.getTime() + duration * 60 * 60 * 1000);
+        
+        document.getElementById('displaySearchPeriod').innerHTML = 
+            `From: <strong>${startDateTime.toISOString().replace('T', ' ').substring(0, 19)} UTC</strong><br>` +
+            `To: <strong>${endDateTime.toISOString().replace('T', ' ').substring(0, 19)} UTC</strong> (${duration} hours)`;
+        
+        // Store data for export
+        currentPassData = passes;
+        currentSatelliteName = document.getElementById('satName').value;
+        
+        // Show export button
+        document.getElementById('exportBtn').style.display = 'inline-block';
+        
+        const container = document.getElementById('passesContainer');
+        
+        if (passes.length === 0) {
+            const duration = document.getElementById('searchDuration').value;
+            container.innerHTML = `
+                <div class="alert alert-warning">
+                    <strong>No passes found</strong> above ${minElev}° elevation in the selected ${duration}-hour period.
+                    <hr>
+                    <p class="mb-0"><strong>Suggestions:</strong></p>
+                    <ul class="mb-0">
+                        <li>Try lowering the minimum elevation angle</li>
+                        <li>Extend the search duration to 48 or 72 hours</li>
+                        <li>Choose a different start time</li>
+                        <li>Verify the TLE data is current</li>
+                    </ul>
+                </div>
+            `;
+            return;
+        }
+        
+        // Calculate statistics
+        const totalDuration = passes.reduce((sum, pass) => sum + parseFloat(pass.duration_minutes), 0);
+        const avgDuration = (totalDuration / passes.length).toFixed(2);
+        const maxElevation = Math.max(...passes.map(p => parseFloat(p.max_alt_degrees)));
+        
+        let html = `
+            <!-- Summary Statistics -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card border-primary">
+                        <div class="card-body text-center">
+                            <h3 class="mb-0">${passes.length}</h3>
+                            <small class="text-muted">Total Passes</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-success">
+                        <div class="card-body text-center">
+                            <h3 class="mb-0">${totalDuration.toFixed(1)}</h3>
+                            <small class="text-muted">Total Minutes</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-info">
+                        <div class="card-body text-center">
+                            <h3 class="mb-0">${avgDuration}</h3>
+                            <small class="text-muted">Avg Duration (min)</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-warning">
+                        <div class="card-body text-center">
+                            <h3 class="mb-0">${maxElevation.toFixed(1)}°</h3>
+                            <small class="text-muted">Best Elevation</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <h5 class="mb-3">Detailed Pass Information</h5>
+        `;
+        
+        passes.forEach((pass, index) => {
+            const qualityClass = getPassQuality(parseFloat(pass.max_alt_degrees));
+            
+            html += `
+                <div class="card mb-3 border-${qualityClass}">
+                    <div class="card-header bg-${qualityClass} text-white">
+                        <h5 class="mb-0">
+                            Pass #${index + 1} 
+                            <span class="badge bg-dark float-end">Max Elevation: ${pass.max_alt_degrees}°</span>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <!-- AOS Time -->
+                            <div class="col-md-4">
+                                <div class="border rounded p-3 bg-light h-100">
+                                    <h6 class="text-success mb-2">
+                                        AOS (Acquisition of Signal)
+                                    </h6>
+                                    <div class="fs-5 fw-bold text-dark">${formatTime(pass.aos_time)}</div>
+                                    <small class="text-muted">Satellite rises above ${minElev}°</small>
+                                </div>
+                            </div>
+                            
+                            <!-- Max Altitude Time -->
+                            <div class="col-md-4">
+                                <div class="border rounded p-3 bg-light h-100">
+                                    <h6 class="text-warning mb-2">
+                                        Maximum Elevation
+                                    </h6>
+                                    <div class="fs-5 fw-bold text-dark">${formatTime(pass.max_alt_time, true)}</div>
+                                    <div class="text-primary fw-bold">${pass.max_alt_degrees}° @ ${pass.max_azimuth_degrees}° azimuth</div>
+                                    <small class="text-muted">Best viewing time</small>
+                                </div>
+                            </div>
+                            
+                            <!-- LOS Time -->
+                            <div class="col-md-4">
+                                <div class="border rounded p-3 bg-light h-100">
+                                    <h6 class="text-danger mb-2">
+                                        LOS (Loss of Signal)
+                                    </h6>
+                                    <div class="fs-5 fw-bold text-dark">${formatTime(pass.los_time)}</div>
+                                    <small class="text-muted">Satellite drops below ${minElev}°</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Additional Info -->
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <div>
+                                        <strong>Duration:</strong> ${pass.duration_minutes} minutes<br>
+                                        <small class="text-muted">Total visibility time</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <div>
+                                        <strong>Direction:</strong> ${getDirectionFromAzimuth(parseFloat(pass.max_azimuth_degrees))}<br>
+                                        <small class="text-muted">${pass.max_azimuth_degrees}° azimuth</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-3">
+                            ${getPassDescription(parseFloat(pass.max_alt_degrees))}
+                        </div>
+                        
+                        <!-- Timeline Table -->
+                        <div class="mt-3">
+                            <h6 class="mb-2">Pass Timeline</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-bordered">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th width="30%">Event</th>
+                                            <th width="35%">Time (UTC)</th>
+                                            <th width="35%">Details</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="table-success">
+                                            <td><strong>AOS Start</strong></td>
+                                            <td class="fw-bold">${pass.aos_time}</td>
+                                            <td>Satellite rises above ${minElev}° elevation</td>
+                                        </tr>
+                                        <tr class="table-warning">
+                                            <td><strong>Maximum</strong></td>
+                                            <td class="fw-bold">${pass.aos_time.split(' ')[0]} ${pass.max_alt_time}</td>
+                                            <td>Peak at ${pass.max_alt_degrees}° elevation, ${pass.max_azimuth_degrees}° azimuth (${getDirectionFromAzimuth(parseFloat(pass.max_azimuth_degrees))})</td>
+                                        </tr>
+                                        <tr class="table-danger">
+                                            <td><strong>LOS End</strong></td>
+                                            <td class="fw-bold">${pass.los_time}</td>
+                                            <td>Satellite drops below ${minElev}° elevation</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        container.innerHTML = html;
+        
+        // Scroll to results
+        document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    function getPassQuality(maxAlt) {
+        if (maxAlt >= 60) return 'success';
+        if (maxAlt >= 45) return 'primary';
+        if (maxAlt >= 30) return 'info';
+        if (maxAlt >= 20) return 'warning';
+        return 'secondary';
+    }
+    
+    function formatTime(timeString, shortFormat = false) {
+        // Parse the time string (format: "YYYY-MM-DD HH:MM:SS UTC" or "HH:MM:SS UTC")
+        const parts = timeString.split(' ');
+        
+        if (shortFormat && parts.length === 3) {
+            // Return only time part for max altitude
+            return parts[0];
+        }
+        
+        if (parts.length === 3) {
+            // Full date time format
+            const date = parts[0];
+            const time = parts[1];
+            return `${date} ${time}`;
+        } else if (parts.length === 2) {
+            // Time only format
+            return parts[0];
+        }
+        
+        return timeString;
+    }
+    
+    function getDirectionFromAzimuth(azimuth) {
+        const directions = [
+            'North', 'NNE', 'NE', 'ENE',
+            'East', 'ESE', 'SE', 'SSE',
+            'South', 'SSW', 'SW', 'WSW',
+            'West', 'WNW', 'NW', 'NNW'
+        ];
+        const index = Math.round(azimuth / 22.5) % 16;
+        return directions[index];
+    }
+    
+    function getPassDescription(maxAlt) {
+        if (maxAlt >= 60) {
+            return '<span class="badge bg-success">Excellent Pass</span> - Directly overhead, perfect for observation';
+        } else if (maxAlt >= 45) {
+            return '<span class="badge bg-primary">Very Good Pass</span> - High in the sky, great visibility';
+        } else if (maxAlt >= 30) {
+            return '<span class="badge bg-info">Good Pass</span> - Moderate altitude, good viewing conditions';
+        } else if (maxAlt >= 20) {
+            return '<span class="badge bg-warning">Fair Pass</span> - Lower altitude, may be affected by obstructions';
+        } else {
+            return '<span class="badge bg-secondary">Low Pass</span> - Near horizon, difficult to observe';
+        }
+    }
+    
+    // Store pass data for export
+    let currentPassData = [];
+    let currentSatelliteName = '';
+    
+    function exportPassData() {
+        if (currentPassData.length === 0) {
+            showAlert('No pass data to export', 'warning');
+            return;
+        }
+        
+        // Create CSV content
+        let csv = 'Satellite Passing Times Report\n';
+        csv += `Satellite: ${currentSatelliteName}\n`;
+        csv += `Location: ${document.getElementById('displayLocation').textContent}\n`;
+        csv += `Minimum Elevation: ${document.getElementById('displayMinElev').textContent}°\n`;
+        csv += `Generated: ${new Date().toUTCString()}\n\n`;
+        csv += 'Pass #,AOS Time (UTC),Max Elevation Time (UTC),LOS Time (UTC),Max Elevation (°),Azimuth (°),Direction,Duration (min)\n';
+        
+        currentPassData.forEach((pass, index) => {
+            csv += `${index + 1},`;
+            csv += `"${pass.aos_time}",`;
+            csv += `"${pass.aos_time.split(' ')[0]} ${pass.max_alt_time}",`;
+            csv += `"${pass.los_time}",`;
+            csv += `${pass.max_alt_degrees},`;
+            csv += `${pass.max_azimuth_degrees},`;
+            csv += `${getDirectionFromAzimuth(parseFloat(pass.max_azimuth_degrees))},`;
+            csv += `${pass.duration_minutes}\n`;
+        });
+        
+        // Download CSV
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `satellite_passes_${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        
+        showAlert('Pass data exported successfully!', 'success');
+    }
+    
+    // Auto-load example on page load
+    document.addEventListener('DOMContentLoaded', function() {
+

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LEO Commercialization Planner</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/favicon.svg') }}">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #004146 0%, #001a1d 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .landing-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        
+        .content-wrapper {
+            max-width: 1400px;
+            width: 100%;
+        }
+        
+        .header-section {
+            text-align: left;
+            margin-bottom: 4rem;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+        
+        .logo-circle {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #03BFB5 0%, #018076 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(3, 191, 181, 0.3);
+        }
+        
+        .logo-circle i {
+            font-size: 2.5rem;
+            color: white;
+        }
+        
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .main-title {
+            font-size: 4rem;
+            font-weight: 800;
+            color: #03BFB5;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+        
+        .subtitle {
+            font-size: 1.3rem;
+            color: #e0e0e0;
+            max-width: 600px;
+            line-height: 1.8;
+            margin-bottom: 2.5rem;
+        }
+        
+        .cta-button {
+            background: linear-gradient(135deg, #03BFB5 0%, #018076 100%);
+            color: white;
+            padding: 1rem 3rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(3, 191, 181, 0.3);
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(3, 191, 181, 0.5);
+            background: linear-gradient(135deg, #04d4c9 0%, #01958a 100%);
+        }
+        
+        .map-container {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 2px solid #03BFB5;
+        }
+        
+        .map-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        .satellite-overlay {
+            position: absolute;
+            top: 50%;
+            left: 30%;
+            transform: translate(-50%, -50%);
+            color: #03BFB5;
+            font-size: 1.2rem;
+            font-weight: 600;
+            text-shadow: 0 0 10px rgba(3, 191, 181, 0.8);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% {
+                opacity: 0.7;
+                transform: translate(-50%, -50%) scale(1.1);
+            }
+        }
+        
+        .features-nav {
+            display: flex;
+            gap: 2rem;
+            justify-content: flex-start;
+            margin-top: 2rem;
+        }
+        
+        .feature-link {
+            color: #03BFB5;
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            padding-bottom: 5px;
+        }
+        
+        .feature-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #03BFB5;
+            transition: width 0.3s ease;
+        }
+        
+        .feature-link:hover {
+            color: #04d4c9;
+        }
+        
+        .feature-link:hover::after {
+            width: 100%;
+        }
+        
+        .grid-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(3, 191, 181, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(3, 191, 181, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+        }
+        
+        @media (max-width: 992px) {
+            .main-title {
+                font-size: 3rem;
+            }
+            
+            .subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .features-nav {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 2.5rem;
+            }
+            
+            .logo-circle {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .logo-circle i {
+                font-size: 2rem;
+            }
+            
+            .logo-text {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Grid Background -->
+    <div class="grid-background"></div>
+    
+    <div class="landing-container">
+        <div class="content-wrapper">
+            <div class="row align-items-center">
+                <!-- Left Content -->
+                <div class="col-lg-6">
+                    <div class="header-section">
+                        <!-- Logo and Title -->
+                        <div class="logo-container">
+                            <img src="{{ url_for('static', filename='images/logo-tim.png') }}" alt="Team Logo" style="width: 80px; height: 80px;">
+                        </div>
+                        
+                        <!-- Main Title -->
+                        <h1 class="main-title">LEO Commercialization Planner</h1>
+                        
+                        <!-- Subtitle -->
+                        <p class="subtitle">
+                            A comprehensive platform for planning and managing Low Earth Orbit (LEO) satellite operations. Track satellites in real-time, predict collision risks, visualize space debris, and optimize orbital planning with advanced analytics.
+                        </p>
+                        
+                        <!-- CTA Button -->
+                        <a href="/dashboard" class="cta-button">
+                            Get started
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Right Content - Map -->
+                <div class="col-lg-6">
+                    <div class="map-container">
+                        <img src="{{ url_for('static', filename='images/satellite-map.svg') }}" alt="Satellite Coverage Map">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

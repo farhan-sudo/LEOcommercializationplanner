@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}LEO Commercialization Planner{% endblock %}</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/favicon.svg') }}">
+    
+    <!-- Preload Important Resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://ka-f.fontawesome.com">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome Kit - Official CDN -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <!-- Leaflet CSS for maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+    
+    <style>
+        /* Fiery Ocean Theme - Inline Styles */
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        
+        :root {
+            --dark-teal: #004146;
+            --medium-teal: #018076;
+            --bright-cyan: #03BFB5;
+            --gray: #949398;
+            --light-gray: #EFF5F9;
+            --primary-color: #004146;
+            --secondary-color: #018076;
+            --success-color: #27ae60;
+            --danger-color: #dc2626;
+            --warning-color: #f59e0b;
+        }
+        
+        * {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+        }
+        
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+            background: linear-gradient(135deg, #0a1214 0%, #1a2a2e 100%) !important;
+            min-height: 100vh;
+            color: #e0e0e0 !important;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #004146 0%, #018076 100%) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.3rem;
+            color: rgba(255, 255, 255, 0.95) !important;
+        }
+        
+        .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.95) !important;
+        }
+        
+        .navbar-nav .nav-link:hover {
+            color: #03BFB5 !important;
+        }
+        
+        .main-content {
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            border: 1px solid #2a3a3e;
+            margin-bottom: 2rem;
+            background: #1e2d31 !important;
+        }
+        
+        .card-header {
+            border-radius: 15px 15px 0 0 !important;
+            background: linear-gradient(135deg, #004146 0%, #018076 100%) !important;
+            color: white !important;
+            font-weight: bold;
+            padding: 1.2rem;
+            border-bottom: 3px solid #03BFB5 !important;
+        }
+        
+        .card-header h1,
+        .card-header h2,
+        .card-header h3,
+        .card-header h4,
+        .card-header h5,
+        .card-header h6 {
+            color: white !important;
+        }
+        
+        .card-body {
+            color: #e0e0e0 !important;
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            color: #03BFB5 !important;
+            font-weight: 600;
+        }
+        
+        p, label, .form-label {
+            color: #e0e0e0 !important;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #004146 0%, #03BFB5 100%) !important;
+            border: none !important;
+            border-radius: 8px;
+            padding: 0.6rem 1.5rem;
+            transition: all 0.3s;
+            color: white !important;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #018076 0%, #004146 100%) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(3, 191, 181, 0.4);
+        }
+        
+        .btn-success {
+            background: #27ae60 !important;
+            border: none;
+            border-radius: 8px;
+            color: white !important;
+        }
+        
+        .btn-info {
+            background: linear-gradient(135deg, #03BFB5 0%, #018076 100%) !important;
+            border: none;
+            border-radius: 8px;
+            color: white !important;
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%) !important;
+            border: none;
+            border-radius: 8px;
+            color: white !important;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%) !important;
+            border: none;
+            border-radius: 8px;
+            color: white !important;
+        }
+        
+        .alert {
+            border-radius: 10px;
+            border: none;
+            border-left: 4px solid;
+        }
+        
+        .alert-info {
+            background-color: #e0f7f6 !important;
+            border-left-color: #03BFB5 !important;
+            color: #004146 !important;
+        }
+        
+        .alert-success {
+            background-color: #dcfce7 !important;
+            border-left-color: #16a34a !important;
+            color: #166534 !important;
+        }
+        
+        .alert-warning {
+            background-color: #fff4e6 !important;
+            border-left-color: #f59e0b !important;
+            color: #92400e !important;
+        }
+        
+        .alert-danger {
+            background-color: #fee2e2 !important;
+            border-left-color: #dc2626 !important;
+            color: #991b1b !important;
+        }
+        
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+        
+        .footer {
+            background: linear-gradient(135deg, #018076 0%, #004146 100%) !important;
+            color: white;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+        
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #004146, #03BFB5) !important;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 2rem;
+            color: white;
+        }
+        
+        /* Force Icon Display - CRITICAL */
+        i, .fa, .fas, .far, .fab, .bi {
+            display: inline-block !important;
+            font-style: normal !important;
+            font-variant: normal !important;
+            text-rendering: auto !important;
+            -webkit-font-smoothing: antialiased !important;
+            -moz-osx-font-smoothing: grayscale !important;
+            vertical-align: middle !important;
+        }
+        
+        /* Ensure Font Awesome Loads */
+        @font-face {
+            font-family: 'Font Awesome 6 Free';
+            font-style: normal;
+            font-weight: 900;
+            font-display: block;
+        }
+        
+        .feature-icon i,
+        .card-header i,
+        .btn i,
+        .navbar i {
+            font-size: inherit;
+            line-height: 1;
+        }
+        
+        .stat-card {
+            background: #1e2d31;
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+            border-left: 4px solid #004146;
+        }
+        
+        .stat-card:hover {
+            border-left-color: #03BFB5;
+            box-shadow: 0 5px 20px rgba(3, 191, 181, 0.5);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #03BFB5 !important;
+        }
+        
+        #map, #trackingMap, #leafletMap {
+            height: 500px;
+            border-radius: 10px;
+            border: 2px solid #03BFB5;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 8px;
+            border: 2px solid #2a3a3e;
+            padding: 0.6rem 1rem;
+            background-color: #0f1b1e;
+            color: #e0e0e0 !important;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: #03BFB5 !important;
+            box-shadow: 0 0 0 0.2rem rgba(3, 191, 181, 0.25) !important;
+            background-color: #0f1b1e !important;
+            color: #e0e0e0 !important;
+        }
+        
+        .table {
+            color: #e0e0e0 !important;
+        }
+        
+        .table thead th {
+            background: linear-gradient(135deg, #004146 0%, #03BFB5 100%) !important;
+            color: white !important;
+            font-weight: 600;
+        }
+        
+        .table tbody {
+            background-color: #1e2d31;
+        }
+        
+        .table-hover tbody tr:hover {
+            background-color: rgba(3, 191, 181, 0.25) !important;
+        }
+        
+        .badge.bg-primary {
+            background-color: #004146 !important;
+        }
+        
+        .badge.bg-success {
+            background-color: #16a34a !important;
+        }
+        
+        .badge.bg-warning {
+            background-color: #f59e0b !important;
+        }
+        
+        .badge.bg-danger {
+            background-color: #dc2626 !important;
+        }
+        
+        .badge.bg-info {
+            background-color: #03BFB5 !important;
+        }
+        
+        .list-group-item {
+            color: #e0e0e0 !important;
+            background-color: #1e2d31;
+            border-left: 3px solid transparent;
+            border-color: #2a3a3e;
+        }
+        
+        .list-group-item:hover {
+            background-color: rgba(3, 191, 181, 0.2) !important;
+            border-left-color: #03BFB5;
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        
+        .loading-overlay.active {
+            display: flex;
+        }
+        
+        .loading-overlay .text-white {
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/dashboard">
+                <img src="{{ url_for('static', filename='images/logo-tim.png') }}" alt="Team Logo" style="width: 30px; height: 30px; margin-right: 10px; vertical-align: middle;"> LEO Commercialization Planner
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/collision-prediction">Collision Prediction</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/debris-visualization">Debris Map</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/satellite-tracking">Satellite Tracking</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/passing-time">Passing Time</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="text-center text-white">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-3 fs-5">Processing...</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container main-content">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container text-center">
+            <p class="mb-0">&copy; 2025 Satellite & Debris Tracking System. Built for NASA Space Apps Challenge.</p>
+            <p class="mb-0 mt-2">
+                <small>Powered by Flask, SGP4, Skyfield, and Cartopy</small>
+            </p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Font Awesome JS (Additional Fallback) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js" crossorigin="anonymous"></script>
+    
+    <!-- Common JS Functions -->
+    <script src="{{ url_for('static', filename='js/common.js') }}"></script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
