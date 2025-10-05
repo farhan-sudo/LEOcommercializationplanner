@@ -11,3 +11,4 @@ pyproj==3.6.1
 Werkzeug==3.0.3
 Pillow>=10.0.0
 Cython>=3.0.0
+gunicorn==21.2.0
